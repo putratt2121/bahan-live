@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korun Mega Wheel Live</title>
+<style>
+:root{
+  --gold:#ffd43b; --gold2:#ff9b0b; --pink:#ff2d88; --purple:#7d20d5;
+  --panel:#110d20; --panel2:#1a102a; --cyan:#25f4ee; --red:#fe2c55;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#080610;color:white}
+body{
+  background:
+    radial-gradient(circle at 30% 20%,rgba(108,25,184,.24),transparent 28%),
+    radial-gradient(circle at 75% 25%,rgba(255,35,96,.13),transparent 24%),
+    linear-gradient(180deg,#080610,#0d0717 55%,#07050e);
+  overflow-x:hidden;
+}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;
+  background-image:radial-gradient(circle,rgba(255,255,255,.65) 0 1px,transparent 1.8px);
+  background-size:34px 34px;
+}
+.app{width:100%;min-height:100vh;padding:6px 8px 8px}
+.marquee{
+  height:48px;border:2px solid #ff8c18;border-radius:13px;
+  box-shadow:0 0 0 2px #ff2a9b inset,0 0 18px rgba(255,50,180,.5);
+  overflow:hidden;background:#07070d;display:flex;align-items:center;margin-bottom:8px
+}
+.marquee-track{display:flex;width:max-content;animation:scroll 18s linear infinite}
+.marquee-track span{font-weight:1000;font-size:clamp(14px,1.6vw,24px);padding-right:70px;white-space:nowrap}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+.grid{
+  display:grid;grid-template-columns:minmax(250px,28%) minmax(430px,44%) minmax(280px,28%);
+  gap:12px;align-items:start
+}
+.panel{
+  background:linear-gradient(180deg,rgba(26,13,45,.98),rgba(8,8,15,.98));
+  border:1px solid rgba(222,118,255,.38);border-radius:14px;
+  box-shadow:0 0 22px rgba(145,39,255,.16),inset 0 0 16px rgba(255,255,255,.025);
+  overflow:hidden;margin-bottom:12px
+}
+.panel-title{
+  padding:10px 13px;font-weight:1000;font-size:16px;text-transform:uppercase;
+  background:linear-gradient(90deg,#552075,#2a1141 55%,#140d20);
+  border-bottom:1px solid rgba(255,255,255,.08)
+}
+.logo{
+  font-size:clamp(32px,4vw,58px);line-height:.82;font-weight:1000;text-transform:uppercase;
+  text-shadow:0 4px 0 #4b2689,0 0 16px #ffba20;margin:4px 0 12px 7px
+}
+.logo .korun{display:block;color:#ffc928;letter-spacing:2px}
+.logo .mega{display:block;color:#fff}
+.live{display:inline-block;background:#ef222b;border-radius:6px;padding:3px 9px;font-size:16px;margin-left:8px}
+.ticket-note{
+  padding:8px 12px;border:1px solid #9c5a19;background:#08080d;border-radius:10px;
+  font-weight:900;font-size:13px;color:#fff;margin-bottom:12px
+}
+.ticket-note b{color:#ffd43b}
+.leader-row{
+  display:grid;grid-template-columns:34px 1fr 72px 55px;align-items:center;
+  gap:5px;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.07)
+}
+.rank{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:#383838;font-weight:1000}
+.leader-row:nth-child(2) .rank{background:linear-gradient(#ffe479,#c47d00);color:#271100}
+.leader-row:nth-child(3) .rank{background:linear-gradient(#f3f3f3,#888);color:#222}
+.leader-row:nth-child(4) .rank{background:linear-gradient(#e49754,#8f491f);color:#241000}
+.name,.score{font-weight:1000}
+.score{color:#ffd43b;text-align:right;font-size:18px}
+.time{color:#c9c9d4;text-align:right;font-size:12px}
+.info-block{padding:13px 15px;font-size:13px;line-height:1.45}
+.info-block b{color:#ffd43b}
+.steps{padding:12px 16px;margin:0;list-style:none}
+.steps li{margin:8px 0;font-weight:800;font-size:13px}
+.steps li span{color:#ffd43b;margin-right:7px}
+.reminder{padding:14px 16px;font-weight:800;line-height:1.45}
+.reminder strong{color:#ffd43b}
+
+.center{display:flex;flex-direction:column;align-items:center}
+.top-status{
+  width:100%;display:grid;grid-template-columns:1fr 1.2fr;gap:10px;margin-bottom:6px
+}
+.status-box{
+  background:linear-gradient(180deg,#160f22,#08080d);border:1px solid #8c6c27;border-radius:14px;
+  padding:10px;text-align:center;box-shadow:0 0 16px rgba(255,181,32,.12)
+}
+.status-big{font-size:clamp(24px,3.2vw,44px);font-weight:1000;color:#ffd43b}
+.status-small{font-size:12px;font-weight:800;color:#ddd}
+.status-small .green{color:#84ff62} .status-small .cyan{color:#4cefff}
+
+.wheel-shell{
+  width:min(47vw,670px);aspect-ratio:1;position:relative;display:grid;place-items:center;margin-top:2px;
+  filter:drop-shadow(0 0 18px rgba(255,148,0,.4))
+}
+.ring{position:absolute;inset:1%;border-radius:50%;background:linear-gradient(#ffdc4d,#ff9400);
+  box-shadow:0 0 0 5px #8f4800 inset,0 0 24px #ff9b13}
+canvas{position:absolute;width:91%;height:91%;border-radius:50%;background:#111}
+.pointer{
+  position:absolute;z-index:7;top:-1%;left:50%;transform:translateX(-50%);
+  width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;
+  border-top:62px solid #ffb21a;filter:drop-shadow(0 3px 0 #7e2600) drop-shadow(0 0 8px #ffd84c)
+}
+.hub{
+  position:absolute;z-index:5;width:29%;aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;text-align:center;
+  background:radial-gradient(circle at 40% 28%,#3b2415,#080808 70%);
+  border:7px solid #ffbd1f;box-shadow:0 0 0 4px #6a3908 inset,0 0 18px #ff9f19
+}
+.hub-inner{font-weight:1000;font-size:clamp(17px,2.2vw,31px);line-height:.9;color:#ffc628}
+.hub-inner small{display:block;color:#fff;font-size:.48em;margin-top:7px}
+
+.spin-button{
+  width:min(260px,40vw);aspect-ratio:1;border-radius:50%;border:7px solid #ffbf2a;
+  background:radial-gradient(circle at 50% 35%,#2b231e,#100b0b 70%);
+  box-shadow:0 0 0 5px #6f3c09 inset,0 0 25px #ac23ff,0 0 45px rgba(255,149,0,.45);
+  margin-top:-35px;z-index:8;cursor:pointer;color:white;display:flex;flex-direction:column;align-items:center;justify-content:center
+}
+.spin-button img{width:45%;max-width:125px;display:block;margin-bottom:3px}
+.spin-button strong{font-size:clamp(22px,3vw,38px);line-height:.95;color:#ffd43b;text-shadow:0 2px 0 #6e3500}
+.spin-button:disabled{filter:grayscale(.8);opacity:.55;cursor:not-allowed}
+
+.right-head{
+  padding:14px;text-align:center;background:linear-gradient(180deg,#271037,#100815)
+}
+.right-head .period{color:#ff63df;font-weight:1000;font-size:17px}
+.total-ticket{font-size:clamp(30px,3vw,45px);font-weight:1000;color:#ffd43b}
+.section-label{padding:8px 12px;font-weight:1000;color:#ff5454;font-size:15px}
+.section-label.other{color:#ffd43b}
+.history-wrap{max-height:282px;overflow:auto;padding:0 8px 8px}
+table{width:100%;border-collapse:separate;border-spacing:0 5px}
+td{padding:7px 10px;background:#050505;font-size:13px}
+td:first-child{border-radius:7px 0 0 7px;font-weight:1000}
+td:last-child{border-radius:0 7px 7px 0;text-align:right;color:#ddd}
+.main-prize{color:#ff4343} .other-prize{color:#65d7ff}
+.period-done{
+  display:none;padding:12px;margin:10px;border-radius:12px;text-align:center;
+  background:linear-gradient(135deg,#39204c,#16101f);border:1px solid #ffbf36
+}
+.period-done.show{display:block}
+.period-done button{
+  margin-top:8px;border:0;border-radius:999px;padding:9px 16px;font-weight:1000;cursor:pointer
+}
+
+.footer{
+  margin-top:8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;
+  text-align:center;font-weight:900;font-size:13px
+}
+.footer div{padding:10px 8px;border-top:1px solid rgba(255,255,255,.09)}
+
+@media(max-width:1000px){
+  .grid{grid-template-columns:1fr}
+  .left{order:2} .center{order:1} .right{order:3}
+  .wheel-shell{width:min(92vw,700px)}
+  .spin-button{width:min(250px,55vw)}
+}
+
+.spin-button img{display:none!important}
+.spin-icon{
+  font-size:clamp(44px,6vw,78px);
+  line-height:1;
+  margin-bottom:7px;
+  filter:drop-shadow(0 0 8px rgba(255,196,45,.65));
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="marquee">
+    <div class="marquee-track">
+      <span>✨ BERBAGI KORUN SETIAP SAAT ✨ &nbsp;&nbsp; ❤️ ORANG BAIK BERBAGI KORUN MELALUI GAME INI ❤️ &nbsp;&nbsp;</span>
+      <span aria-hidden="true">✨ BERBAGI KORUN SETIAP SAAT ✨ &nbsp;&nbsp; ❤️ ORANG BAIK BERBAGI KORUN MELALUI GAME INI ❤️ &nbsp;&nbsp;</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <aside class="left">
+      <div class="logo"><span class="korun">KORUN</span><span class="mega">MEGA WHEEL <span class="live">LIVE</span></span></div>
+      <div class="ticket-note">GIFT <b>K1 / K5 / K10</b> → KUMPUL <b>K50 = 1 PUTARAN</b></div>
+
+      <div class="panel">
+        <div class="panel-title">🏆 Top 5 Spender (Skor Tertinggi)</div>
+        <div id="leaderboard">
+          <div class="leader-row"><div class="rank">1</div><div class="name" contenteditable="true">A</div><div class="score" contenteditable="true">0</div><div class="time">--:--</div></div>
+          <div class="leader-row"><div class="rank">2</div><div class="name" contenteditable="true">B</div><div class="score" contenteditable="true">0</div><div class="time">--:--</div></div>
+          <div class="leader-row"><div class="rank">3</div><div class="name" contenteditable="true">C</div><div class="score" contenteditable="true">0</div><div class="time">--:--</div></div>
+          <div class="leader-row"><div class="rank">4</div><div class="name" contenteditable="true">D</div><div class="score" contenteditable="true">0</div><div class="time">--:--</div></div>
+          <div class="leader-row"><div class="rank">5</div><div class="name" contenteditable="true">E</div><div class="score" contenteditable="true">0</div><div class="time">--:--</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="info-block"><b>SETELAH 50 PUTARAN</b><br>30% TOTAL TIKET dibagikan kepada 5 spender dengan skor tertinggi.</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Cara Bermain</div>
+        <ul class="steps">
+          <li><span>🎁 1.</span>Kirim gift K1 / K5 / K10</li>
+          <li><span>🎟️ 2.</span>Kumpulkan sampai K50</li>
+          <li><span>🎡 3.</span>Host akan memutar roda</li>
+          <li><span>❤️ 4.</span>Hadiah dari roda dibagikan ke penonton live</li>
+        </ul>
+      </div>
+
+      <div class="panel reminder">
+        <strong>INGAT!</strong><br>Semakin banyak gift, semakin besar skor kamu.<br><strong>Jadilah Spender Terbaik!</strong>
+      </div>
+    </aside>
+
+    <main class="center">
+      <div class="top-status">
+        <div class="status-box">
+          <div class="status-big" id="periodLabel">PERIODE 1</div>
+          <div class="status-small">PUTARAN</div>
+          <div class="status-big"><span id="spinCount">0</span> / 50</div>
+        </div>
+        <div class="status-box">
+          <div class="status-small">TARGET TIKET</div>
+          <div class="status-big">K2.500</div>
+          <div class="status-small"><span class="green">70% DIBAGIKAN KE PENONTON</span><br><span class="cyan">30% HADIAH 5 SPENDER TERATAS</span></div>
+        </div>
+      </div>
+
+      <div class="wheel-shell">
+        <div class="ring"></div>
+        <canvas id="wheel" width="1100" height="1100"></canvas>
+        <div class="pointer"></div>
+        <div class="hub"><div class="hub-inner">👑<br>KORUN<small>MEGA WHEEL</small></div></div>
+      </div>
+
+      <button class="spin-button" id="spinBtn">
+        <div class="spin-icon">🎡</div>
+        <strong>PUTAR<br>RODA</strong>
+      </button>
+
+      <div class="period-done" id="periodDone">
+        <div style="font-weight:1000;font-size:20px">✅ PERIODE SELESAI</div>
+        <div style="font-size:12px;margin-top:3px">50/50 putaran • tentukan 5 pemenang</div>
+        <button id="newPeriodBtn">MULAI PERIODE BARU</button>
+      </div>
+    </main>
+
+    <aside class="right">
+      <div class="panel">
+        <div class="right-head">
+          <div class="period">🎉 1 PERIODE = 50 PUTARAN</div>
+          <div style="margin-top:6px;font-weight:800">TOTAL TIKET</div>
+          <div class="total-ticket" id="ticketTotal">K 0</div>
+          <div style="font-weight:900">TERKUMPUL</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">🏅 Riwayat Hasil Putaran</div>
+        <div class="section-label">🔥 HADIAH UTAMA (K200 & K100)</div>
+        <div class="history-wrap"><table><tbody id="mainHistory"></tbody></table></div>
+        <div class="section-label other">🎁 HADIAH LAIN</div>
+        <div class="history-wrap"><table><tbody id="otherHistory"></tbody></table></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="footer">
+    <div>🔥 BERSAMA KITA SERU, BERSAMA KITA BERBAGI!</div>
+    <div>❤️ SUPPORT TERUS LIVE INI YA!</div>
+    <div>👑 TERIMA KASIH ORANG BAIK!</div>
+  </div>
+</div>
+
+<script>
+const prizes = [
+  "ZONK","KORUN 5","KORUN 10","KORUN 5","KORUN 20","ZONK",
+  "KORUN 10","KORUN 5","KORUN 30","ZONK","KORUN 20","KORUN 5",
+  "KORUN 40","KORUN 10","ZONK","KORUN 30","KORUN 5","KORUN 20",
+  "KORUN 50","KORUN 10","ZONK","KORUN 30","KORUN 40","KORUN 50",
+  "KORUN 100","KORUN 200"
+];
+const colors=["#e21b2d","#ff9c00","#851acc","#0069dd","#198b17","#111111"];
+const canvas=document.getElementById("wheel"),ctx=canvas.getContext("2d");
+const spinBtn=document.getElementById("spinBtn"), mainHistoryEl=document.getElementById("mainHistory"), otherHistoryEl=document.getElementById("otherHistory");
+const spinCountEl=document.getElementById("spinCount"), periodLabel=document.getElementById("periodLabel"), ticketTotal=document.getElementById("ticketTotal");
+const periodDone=document.getElementById("periodDone"), newPeriodBtn=document.getElementById("newPeriodBtn");
+
+const N=prizes.length, slice=Math.PI*2/N, C=canvas.width/2, R=canvas.width*.47;
+let rotation=0,spinning=false,period=1,spinCount=0,order=0;
+let history=[];
+
+function drawWheel(rot=0){
+  ctx.clearRect(0,0,canvas.width,canvas.height); ctx.save(); ctx.translate(C,C); ctx.rotate(rot);
+  for(let i=0;i<N;i++){
+    const a=i*slice-Math.PI/2;
+    ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R,a,a+slice);ctx.closePath();
+    ctx.fillStyle=colors[i%colors.length];ctx.fill();ctx.lineWidth=3;ctx.strokeStyle="#ffcf2c";ctx.stroke();
+    ctx.save();ctx.rotate(a+slice/2);ctx.translate(R*.78,0);ctx.rotate(Math.PI/2);
+    const p=prizes[i];
+    ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fff";
+    ctx.shadowColor="#000";ctx.shadowBlur=5;
+    if(p==="ZONK"){ctx.font="900 27px Arial";ctx.fillText("ZONK",0,0)}
+    else{const n=p.replace("KORUN ","");ctx.font="900 19px Arial";ctx.fillText("K",0,-12);ctx.font="900 30px Arial";ctx.fillText(n,0,15)}
+    ctx.restore();
+  }
+  ctx.beginPath();ctx.arc(0,0,R*.30,0,Math.PI*2);ctx.fillStyle="#080808";ctx.fill();ctx.lineWidth=13;ctx.strokeStyle="#ffc52a";ctx.stroke();
+  ctx.restore();
+}
+function norm(a){const t=Math.PI*2;return((a%t)+t)%t}
+function indexAtPointer(rot){return Math.floor(norm(-rot)/slice)%N}
+function ease(t){return 1-Math.pow(1-t,5)}
+function nowHM(){return new Intl.DateTimeFormat("id-ID",{hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date())}
+function valueOf(p){return p==="ZONK"?0:parseInt(p.replace("KORUN ",""),10)||0}
+function beep(freq=450,d=.02,v=.012){
+  try{const ac=beep.ac||(beep.ac=new(window.AudioContext||window.webkitAudioContext)());const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=freq;o.type="triangle";g.gain.value=v;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}
+}
+function renderHistory(){
+  const sorted=[...history].sort((a,b)=>b.value-a.value||a.order-b.order);
+  const main=sorted.filter(x=>x.value>=100), other=sorted.filter(x=>x.value<100);
+  function fill(el,rows,cls){
+    el.innerHTML="";
+    if(!rows.length){el.innerHTML='<tr><td>-</td><td>-</td></tr>';return}
+    rows.forEach(x=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td class="${cls}">${x.prize}</td><td>Jam dapat ${x.time}</td>`;
+      el.appendChild(tr);
+    });
+  }
+  fill(mainHistoryEl,main,"main-prize"); fill(otherHistoryEl,other,"other-prize");
+}
+function updateStatus(){
+  spinCountEl.textContent=spinCount; periodLabel.textContent=`PERIODE ${period}`;
+  ticketTotal.textContent=`K ${spinCount*50}`;
+}
+spinBtn.addEventListener("click",()=>{
+  if(spinning||spinCount>=50)return;
+  spinning=true;spinBtn.disabled=true;
+  const start=rotation,target=start+(8+Math.floor(Math.random()*4))*Math.PI*2+Math.random()*Math.PI*2,duration=5000,t0=performance.now();
+  let last=-1;
+  function frame(now){
+    const t=Math.min((now-t0)/duration,1);rotation=start+(target-start)*ease(t);drawWheel(rotation);
+    const tick=Math.floor(rotation/slice);if(tick!==last){beep(400+300*t,.018,.011);last=tick}
+    if(t<1)requestAnimationFrame(frame);
+    else{
+      const prize=prizes[indexAtPointer(rotation)];
+      history.push({prize,value:valueOf(prize),time:nowHM(),order:order++});
+      spinCount++;renderHistory();updateStatus();beep(900,.12,.03);
+      spinning=false;
+      if(spinCount>=50){periodDone.classList.add("show");spinBtn.disabled=true}
+      else spinBtn.disabled=false;
+    }
+  }
+  requestAnimationFrame(frame);
+});
+newPeriodBtn.addEventListener("click",()=>{
+  period++;spinCount=0;history=[];order=0;periodDone.classList.remove("show");
+  renderHistory();updateStatus();spinBtn.disabled=false;
+});
+renderHistory();updateStatus();drawWheel();
+</script>
+</body>
+</html>
